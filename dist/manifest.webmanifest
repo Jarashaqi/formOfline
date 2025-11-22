@@ -1,1 +1,0 @@
-{"name":"Waste Data Entry","short_name":"WasteApp","start_url":"/","display":"standalone","background_color":"#f8fafc","lang":"id","scope":"/","description":"PWA for waste data entry in harsh environments","theme_color":"#10b981","icon":"src/assets/icon.png","categories":["productivity","utilities"],"dir":"ltr"}
