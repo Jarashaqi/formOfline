@@ -16,7 +16,7 @@ const LOCATIONS = [
 function SampahMasukForm() {
   const navigate = useNavigate()
   const userName = getStoredUser()
-  
+
   // Form state
   const [locationId, setLocationId] = useState('')
   const [locationName, setLocationName] = useState('')
@@ -81,7 +81,7 @@ function SampahMasukForm() {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validation
     if (!locationId || !wasteType || !shift || weight <= 0) {
       setSaveError('Harap lengkapi semua field')
@@ -101,12 +101,12 @@ function SampahMasukForm() {
       }
 
       // Save to localStorage
-      const savedEntry = addEntry(entry)
-      
+      const savedEntry = await addEntry(entry)
+
       // Show success message
       setSaveSuccess(true)
       setSaveError('')
-      
+
       // Clear form after 2 seconds and navigate home
       setTimeout(() => {
         // Reset form
@@ -134,7 +134,7 @@ function SampahMasukForm() {
             <h1 className="page-title">Sampah Masuk</h1>
             <p className="page-subtitle">Catat data sampah yang masuk</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
@@ -142,7 +142,7 @@ function SampahMasukForm() {
           </button>
         </div>
       </div>
-      
+
       <div className="p-4">
         {/* Success message */}
         {saveSuccess && (
@@ -150,25 +150,25 @@ function SampahMasukForm() {
             ✓ Entri berhasil disimpan!
           </div>
         )}
-        
+
         {/* Error message */}
         {saveError && (
           <div className="mb-4 p-4 bg-red-100 text-red-800 rounded-lg border border-red-200">
             ✗ {saveError}
           </div>
         )}
-        
+
         {/* Location Section */}
         <div className="card">
           <div className="form-group">
             <label className="form-label">📍 Lokasi</label>
-            <button 
+            <button
               onClick={handleQRScan}
               className="w-full big-button big-button-primary mb-3"
             >
               🔍 Scan QR Lokasi
             </button>
-            
+
             <div className="text-sm text-gray-600 mb-2">atau pilih manual:</div>
             <select
               value={manualLocation}
@@ -182,14 +182,14 @@ function SampahMasukForm() {
                 </option>
               ))}
             </select>
-            
+
             {locationName && (
               <div className="mt-3 p-3 bg-green-50 text-green-800 rounded-lg border border-green-200">
                 <div className="font-medium">Lokasi Terpilih:</div>
                 <div className="text-sm">{locationName} ({locationId})</div>
               </div>
             )}
-            
+
             {scanError && (
               <div className="mt-2 p-3 bg-red-50 text-red-800 rounded-lg border border-red-200">
                 {scanError}
@@ -252,7 +252,7 @@ function SampahMasukForm() {
                 className="w-full max-w-md"
               />
               <div className="weight-controls">
-                <button 
+                <button
                   className="weight-btn minus"
                   onClick={() => setWeight(Math.max(0, weight - 0.5))}
                   disabled={weight <= 0}
@@ -262,7 +262,7 @@ function SampahMasukForm() {
                 <span className="text-lg font-semibold min-w-[100px] text-center bg-white px-4 py-2 rounded-lg border border-gray-200">
                   {weight.toFixed(1)} kg
                 </span>
-                <button 
+                <button
                   className="weight-btn plus"
                   onClick={() => setWeight(Math.min(50, weight + 0.5))}
                   disabled={weight >= 50}
@@ -279,14 +279,13 @@ function SampahMasukForm() {
 
         {/* Save Button */}
         <div className="p-4">
-          <button 
+          <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid 
-                ? 'big-button-primary' 
+            className={`w-full big-button ${isValid
+                ? 'big-button-primary'
                 : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-            }`}
+              }`}
           >
             SIMPAN ENTRI
           </button>
@@ -295,7 +294,7 @@ function SampahMasukForm() {
 
       {/* QR Scanner Modal */}
       {showQRScanner && (
-        <QRScanner 
+        <QRScanner
           onScanSuccess={handleScanSuccess}
           onScanError={handleScanError}
           onClose={handleScannerClose}

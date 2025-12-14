@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate PWA Icons</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #10b981;
+        }
+        .preview {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .preview img {
+            border: 2px solid #ddd;
+            margin: 10px;
+        }
+        button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .instructions {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Generate PWA Icons</h1>
+        <div class="instructions">
+            <p><strong>Instruksi:</strong></p>
+            <ol>
+                <li>Klik tombol di bawah untuk generate icon</li>
+                <li>Icon akan otomatis terdownload</li>
+                <li>Simpan file di folder <code>public/</code></li>
+            </ol>
+        </div>
+        
+        <div class="preview">
+            <h3>Preview Icon:</h3>
+            <div id="preview-container"></div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button onclick="generateIcon(192)">Generate 192x192.png</button>
+            <button onclick="generateIcon(512)">Generate 512x512.png</button>
+        </div>
+    </div>
+
+    <script>
+        // Load SVG
+        async function loadSVG() {
+            try {
+                const response = await fetch('./icon.svg');
+                const svgText = await response.text();
+                return svgText;
+            } catch (error) {
+                console.error('Error loading SVG:', error);
+                return null;
+            }
+        }
+
+        // Generate icon from SVG
+        async function generateIcon(size) {
+            const svgText = await loadSVG();
+            if (!svgText) {
+                alert('Error: Tidak bisa memuat icon.svg');
+                return;
+            }
+
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Create image from SVG
+            const img = new Image();
+            const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, size, size);
+                
+                // Convert to PNG and download
+                canvas.toBlob(function(blob) {
+                    const link = document.createElement('a');
+                    link.download = `pwa-${size}x${size}.png`;
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    URL.revokeObjectURL(link.href);
+                    
+                    alert(`✅ Icon ${size}x${size} berhasil di-generate dan terdownload!`);
+                }, 'image/png');
+            };
+
+            img.onerror = function() {
+                alert('Error: Gagal memuat SVG');
+                URL.revokeObjectURL(url);
+            };
+
+            img.src = url;
+        }
+
+        // Show preview
+        async function showPreview() {
+            const svgText = await loadSVG();
+            if (svgText) {
+                const container = document.getElementById('preview-container');
+                container.innerHTML = `
+                    <img src="./icon.svg" alt="Icon Preview" style="max-width: 200px;">
+                    <div style="margin-top: 10px;">
+                        <small>Ukuran: 192x192 dan 512x512 akan di-generate dari SVG ini</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Load preview on page load
+        showPreview();
+    </script>
+</body>
+</html>
+

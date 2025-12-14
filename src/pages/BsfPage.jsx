@@ -5,24 +5,34 @@ import { getEntries } from '../utils/storage'
 function BsfPage() {
   const navigate = useNavigate()
 
-  const { panenCount, panenTotalKg } = useMemo(() => {
-    const entries = getEntries() || []
-    const today = new Date().toISOString().slice(0, 10)
+  const [stats, setStats] = React.useState({
+    panenCount: 0,
+    panenTotalKg: 0
+  })
 
-    const panenEntries = entries.filter(
-      e => e.formType === 'panen_maggot' && (!e.date || e.date.slice(0, 10) === today || (e.createdAt && e.createdAt.slice(0, 10) === today))
-    )
+  React.useEffect(() => {
+    async function loadStats() {
+      const entries = await getEntries() || []
+      const today = new Date().toISOString().slice(0, 10)
 
-    const total = panenEntries.reduce(
-      (sum, e) => sum + (e.weightKg || 0),
-      0
-    )
+      const panenEntries = entries.filter(
+        e => e.formType === 'panen_maggot' && (!e.date || e.date.slice(0, 10) === today || (e.createdAt && e.createdAt.slice(0, 10) === today))
+      )
 
-    return {
-      panenCount: panenEntries.length,
-      panenTotalKg: total
+      const total = panenEntries.reduce(
+        (sum, e) => sum + (e.weightKg || 0),
+        0
+      )
+
+      setStats({
+        panenCount: panenEntries.length,
+        panenTotalKg: total
+      })
     }
+    loadStats()
   }, [])
+
+  const { panenCount, panenTotalKg } = stats
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -33,7 +43,7 @@ function BsfPage() {
             <h1 className="page-title">Area BSF</h1>
             <p className="page-subtitle">Pantau panen maggot & siklus BSF</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
@@ -70,25 +80,25 @@ function BsfPage() {
             Input Data
           </h2>
           <div className="space-y-3">
-            <Link 
+            <Link
               to="/panen-maggot"
               className="block w-full big-button big-button-primary"
             >
               🪱 Input Panen Maggot
             </Link>
-            <Link 
-                to="/bsf-pakan"
-                className="block w-full big-button big-button-secondary"
+            <Link
+              to="/bsf-pakan"
+              className="block w-full big-button big-button-secondary"
             >
-                ♻️ Input Pakan BSF (Organik)
+              ♻️ Input Pakan BSF (Organik)
             </Link>
-            <Link 
+            <Link
               to="/panen-kasgot"
               className="block w-full big-button big-button-tertiary"
             >
               🧪 Panen Kasgot
             </Link>
-            <Link 
+            <Link
               to="/sisa-organik-pupuk"
               className="block w-full big-button big-button-tertiary"
             >

@@ -5,24 +5,34 @@ import { getEntries } from '../utils/storage'
 function AyamPage() {
   const navigate = useNavigate()
 
-  const { todayCount, todayWeightGram } = useMemo(() => {
-    const entries = getEntries() || []
-    const today = new Date().toISOString().slice(0, 10)
+  const [stats, setStats] = React.useState({
+    todayCount: 0,
+    todayWeightGram: 0
+  })
 
-    const ayamEntries = entries.filter(
-      e => e.formType === 'telur_harian' && e.date === today
-    )
+  React.useEffect(() => {
+    async function loadStats() {
+      const entries = await getEntries() || []
+      const today = new Date().toISOString().slice(0, 10)
 
-    const totalGram = ayamEntries.reduce(
-      (sum, e) => sum + (e.totalWeightGram || 0),
-      0
-    )
+      const ayamEntries = entries.filter(
+        e => e.formType === 'telur_harian' && e.date === today
+      )
 
-    return {
-      todayCount: ayamEntries.length,
-      todayWeightGram: totalGram
+      const totalGram = ayamEntries.reduce(
+        (sum, e) => sum + (e.totalWeightGram || 0),
+        0
+      )
+
+      setStats({
+        todayCount: ayamEntries.length,
+        todayWeightGram: totalGram
+      })
     }
+    loadStats()
   }, [])
+
+  const { todayCount, todayWeightGram } = stats
 
   const todayWeightKg = todayWeightGram / 1000
 
@@ -35,7 +45,7 @@ function AyamPage() {
             <h1 className="page-title">Area Ayam</h1>
             <p className="page-subtitle">Pantau panen telur harian</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
@@ -75,13 +85,13 @@ function AyamPage() {
             Input Data
           </h2>
           <div className="space-y-3">
-            <Link 
+            <Link
               to="/telur-harian"
               className="block w-full big-button big-button-primary"
             >
               🥚 Panen Telur Harian
             </Link>
-            <Link 
+            <Link
               to="/panen-kohei"
               className="block w-full big-button big-button-secondary"
             >

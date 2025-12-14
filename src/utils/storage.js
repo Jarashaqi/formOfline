@@ -1,82 +1,79 @@
 // utils/storage.js
+import * as db from './db'
+import * as api from './api'
 
-const STORAGE_KEY = 'wasteapp_entries'
+// Initialize or migrate on load (side effect, but useful ensures DB is ready)
+db.migrateFromLocalStorage().catch(console.error)
 
-export function getEntries() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    return JSON.parse(raw)
-  } catch (e) {
-    console.error('Error parsing entries from storage', e)
-    return []
-  }
+/**
+ * Returns all entries from IndexedDB.
+ * Returns a Promise<Array>.
+ */
+export async function getEntries() {
+  const entries = await db.getEntries()
+  // Ensure we sort by newest first like before, though DB index helps
+  return entries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 }
 
-export function saveEntries(entries) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
-}
-
-export function addEntry(partialEntry) {
-  const entries = getEntries()
-
+/**
+ * Adds a new entry to IndexedDB.
+ */
+export async function addEntry(partialEntry) {
   const now = new Date().toISOString()
-
   const newEntry = {
     id: `ENT-${Date.now()}-${Math.random().toString(16).slice(2)}`,
     createdAt: now,
-    synced: false,
-    ...partialEntry, // userName, formType, date, dll
+    synced: false, // 0 in some DB designs, but using boolean is fine for IDB
+    ...partialEntry,
   }
 
-  entries.push(newEntry)
-  saveEntries(entries)
-
+  await db.addEntry(newEntry)
   return newEntry
 }
-// ganti dengan URL shared hosting kamu
-const API_BASE = 'https://dev.sekolahsampah.id/api';
 
+export async function saveEntries(entries) {
+  await db.saveEntries(entries)
+}
+
+/**
+ * Syncs unsynced data to server.
+ * 1. Find unsynced in DB
+ * 2. POST to server
+ * 3. Update DB with synced status
+ */
 export async function syncEntriesToServer() {
-  const entries = getEntries()
-  const unsynced = entries.filter(e => !e.synced)
-
-  if (unsynced.length === 0) {
-    return { success: true, syncedCount: 0 }
-  }
-
   try {
-    const res = await fetch(`${API_BASE}/sync.php`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // opsional: token simple biar nggak sembarang orang bisa post
-        'X-API-KEY': 'SOME_SECRET_KEY',
-      },
-      body: JSON.stringify({ entries: unsynced }),
-    })
+    const allEntries = await db.getEntries()
+    // IDB doesn't always support boolean indexing across all browsers perfectly in older versions,
+    // safe to filter in memory if list isn't huge.
+    // Or use the db.getUnsyncedEntries helper if we implemented it robustly.
+    // Let's filter manually to be safe for now:
+    const unsynced = allEntries.filter(e => !e.synced && e.synced !== '1' && e.synced !== 1)
 
-    if (!res.ok) {
-      const text = await res.text()
-      throw new Error(text || `HTTP ${res.status}`)
+    if (unsynced.length === 0) {
+      return { success: true, syncedCount: 0 }
     }
 
-    const data = await res.json()
-    if (!data.success) {
-      throw new Error(data.message || 'Unknown error from server')
+    // Call API
+    const responseData = await api.pushEntries(unsynced)
+
+    // Mark as synced
+    const syncedIds = new Set(Array.isArray(responseData.syncedIds) ? responseData.syncedIds : [])
+
+    // Update local DB
+    // We only update the ones confirmed by server
+    let count = 0
+    for (const entry of unsynced) {
+      if (syncedIds.has(entry.id)) {
+        entry.synced = true
+        await db.updateEntry(entry)
+        count++
+      }
     }
 
-    const syncedIds = new Set(data.syncedIds || [])
-
-    const updated = entries.map(e =>
-      syncedIds.has(e.id) ? { ...e, synced: true } : e
-    )
-
-    saveEntries(updated)
-
-    return { success: true, syncedCount: syncedIds.size }
+    return { success: true, syncedCount: count }
   } catch (err) {
     console.error('Sync error:', err)
-    return { success: false, error: err.message }
+    return { success: false, error: err.message || 'Unknown error' }
   }
 }

@@ -37,7 +37,7 @@ function PanenKasgotForm() {
     })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!source) {
       setSaveError('Harap isi sumber kasgot (dari mana)')
       return
@@ -56,7 +56,7 @@ function PanenKasgotForm() {
         source // dari mana (bed, box, lokasi)
       }
 
-      addEntry(entry)
+      await addEntry(entry)
 
       setSaveSuccess(true)
       setSaveError('')
@@ -82,7 +82,7 @@ function PanenKasgotForm() {
             <h1 className="page-title">Panen Kasgot</h1>
             <p className="page-subtitle">Catat panen kasgot (frass BSF)</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/bsf')}
             className="big-button big-button-outline text-sm"
           >
@@ -174,9 +174,8 @@ function PanenKasgotForm() {
           <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid ? 'big-button-primary' : 'big-button-tertiary'
-            }`}
+            className={`w-full big-button ${isValid ? 'big-button-primary' : 'big-button-tertiary'
+              }`}
           >
             SIMPAN PANEN KASGOT
           </button>

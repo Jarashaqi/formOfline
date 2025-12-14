@@ -37,7 +37,7 @@ function SisaOrganikPupukForm() {
     })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!place) {
       setSaveError('Harap isi lokasi/bed pupuk')
       return
@@ -56,7 +56,7 @@ function SisaOrganikPupukForm() {
         place
       }
 
-      addEntry(entry)
+      await addEntry(entry)
 
       setSaveSuccess(true)
       setSaveError('')
@@ -84,7 +84,7 @@ function SisaOrganikPupukForm() {
               Catat jumlah sampah organik yang tidak dimakan maggot dan menjadi pupuk
             </p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/bsf')}
             className="big-button big-button-outline text-sm"
           >
@@ -176,9 +176,8 @@ function SisaOrganikPupukForm() {
           <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid ? 'big-button-primary' : 'big-button-tertiary'
-            }`}
+            className={`w-full big-button ${isValid ? 'big-button-primary' : 'big-button-tertiary'
+              }`}
           >
             SIMPAN DATA PUPUK
           </button>

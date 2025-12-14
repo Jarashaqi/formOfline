@@ -46,6 +46,32 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: 5173
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'https://dev.sekolahsampah.id',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            // Aggressively mock a server-to-server or CLI request
+            console.log('Proxying API request:', req.url); // Verify in terminal that this runs
+
+            proxyReq.setHeader('Origin', 'https://dev.sekolahsampah.id');
+            proxyReq.setHeader('Referer', 'https://dev.sekolahsampah.id/');
+
+            // Mask the User-Agent
+            proxyReq.setHeader('User-Agent', 'curl/7.68.0');
+
+            // Strip cookies and proxy fingerprints
+            proxyReq.removeHeader('Cookie');
+            proxyReq.removeHeader('X-Forwarded-For');
+            proxyReq.removeHeader('X-Forwarded-Proto');
+            proxyReq.removeHeader('X-Forwarded-Host');
+            proxyReq.removeHeader('Via');
+          });
+        }
+      }
+    }
   }
 })

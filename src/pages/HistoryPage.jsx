@@ -14,12 +14,12 @@ function HistoryPage() {
     loadEntries()
   }, [])
 
-  const loadEntries = () => {
+  const loadEntries = async () => {
     setLoading(true)
     try {
-      const storedEntries = getEntries() || []
+      const storedEntries = await getEntries() || []
       // Sort by newest first
-      const sortedEntries = storedEntries.sort((a, b) => 
+      const sortedEntries = storedEntries.sort((a, b) =>
         new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
       )
       setEntries(sortedEntries)
@@ -33,7 +33,7 @@ function HistoryPage() {
   const handleSync = async () => {
     setSyncing(true)
     setSyncMessage('')
-    
+
     try {
       const result = await syncEntriesToServer()
       if (result.success) {
@@ -55,7 +55,7 @@ function HistoryPage() {
       sampah_masuk: 'Sampah Masuk',
       panen_maggot: 'Panen Maggot',
       telur_harian: 'Panen Telur Harian',
-      sampah_terpilah: 'Sampah Terpilah'  
+      sampah_terpilah: 'Sampah Terpilah'
     }
     return labels[formType] || 'Umum'
   }
@@ -64,7 +64,7 @@ function HistoryPage() {
     if (!dateString) return '-'
     return new Date(dateString).toLocaleString('id-ID', {
       day: '2-digit',
-      month: '2-digit', 
+      month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -75,7 +75,7 @@ function HistoryPage() {
     if (!type) return '-'
     const labels = {
       sayur: '🌱 Sayur',
-      makanan: '🍛 Makanan Matang', 
+      makanan: '🍛 Makanan Matang',
       campuran: '🔁 Campuran',
       lainnya: 'Lainnya'
     }
@@ -92,7 +92,7 @@ function HistoryPage() {
     return labels[shift] || shift
   }
 
-  const getHarvestTypeLabel = (harvestType) =>  {
+  const getHarvestTypeLabel = (harvestType) => {
     if (!harvestType) return '-'
     const labels = {
       dewasa: 'BSF Dewasa',
@@ -101,7 +101,7 @@ function HistoryPage() {
       prepupa: 'Prepupa'
     }
     return labels[harvestType] || harvestType
-  }  
+  }
 
   const formatLayingSummary = (entry) => {
     if (!entry || !entry.layingCages) return null
@@ -109,7 +109,7 @@ function HistoryPage() {
       totalLaying: entry.totalLaying || entry.layingCages.length,
       totalCages: entry.totalCages || 72
     }
-  }  
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,15 +119,15 @@ function HistoryPage() {
             <h1 className="page-title">Riwayat Entri</h1>
             <p className="page-subtitle">Data yang telah dicatat di lapangan</p>
           </div>
-          <Link 
-            to="/home" 
+          <Link
+            to="/home"
             className="big-button big-button-outline text-sm"
           >
             Kembali
           </Link>
         </div>
       </div>
-      
+
       <div className="p-4">
         {/* Sync button and stats */}
         <div className="card mb-4">
@@ -135,11 +135,10 @@ function HistoryPage() {
             <button
               onClick={handleSync}
               disabled={syncing}
-              className={`px-6 py-3 rounded-lg font-medium ${
-                syncing 
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+              className={`px-6 py-3 rounded-lg font-medium ${syncing
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                   : 'bg-gray-900 text-white hover:bg-black'
-              }`}
+                }`}
             >
               {syncing ? 'Menyinkronkan...' : '🔄 Sinkron Data'}
             </button>
@@ -147,18 +146,17 @@ function HistoryPage() {
               Total: {entries.length} entri | Belum sinkron: {entries.filter(e => !e.synced).length}
             </div>
           </div>
-          
+
           {syncMessage && (
-            <div className={`mt-3 p-3 rounded-lg text-center ${
-              syncMessage.includes('Gagal') 
+            <div className={`mt-3 p-3 rounded-lg text-center ${syncMessage.includes('Gagal')
                 ? 'bg-red-100 text-red-800 border border-red-200'
                 : 'bg-green-100 text-green-800 border border-green-200'
-            }`}>
+              }`}>
               {syncMessage}
             </div>
           )}
         </div>
-        
+
         {loading ? (
           <div className="text-center py-8 text-gray-500">
             Memuat data...

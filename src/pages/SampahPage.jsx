@@ -5,35 +5,46 @@ import { getEntries } from '../utils/storage'
 function SampahPage() {
   const navigate = useNavigate()
 
-  const { masukKg, organikKg, nonOrganikKg } = useMemo(() => {
-    const entries = getEntries() || []
-    const today = new Date().toISOString().slice(0, 10)
+  const [stats, setStats] = React.useState({
+    masukKg: 0,
+    organikKg: 0,
+    nonOrganikKg: 0
+  })
 
-    let masuk = 0
-    let organik = 0
-    let nonOrganik = 0
+  React.useEffect(() => {
+    async function loadStats() {
+      const entries = await getEntries() || []
+      const today = new Date().toISOString().slice(0, 10)
 
-    entries.forEach(e => {
-      const createdDay = e.createdAt ? e.createdAt.slice(0, 10) : null
-      const isToday = createdDay === today || e.date === today
+      let masuk = 0
+      let organik = 0
+      let nonOrganik = 0
 
-      if (!isToday) return
+      entries.forEach(e => {
+        const createdDay = e.createdAt ? e.createdAt.slice(0, 10) : null
+        const isToday = createdDay === today || e.date === today
 
-      if (e.formType === 'sampah_masuk') {
-        masuk += e.weightKg || 0
-      }
-      if (e.formType === 'sampah_terpilah') {
-        organik += e.organicKg || 0
-        nonOrganik += e.inorganicKg || 0
-      }
-    })
+        if (!isToday) return
 
-    return {
-      masukKg: masuk,
-      organikKg: organik,
-      nonOrganikKg: nonOrganik
+        if (e.formType === 'sampah_masuk') {
+          masuk += e.weightKg || 0
+        }
+        if (e.formType === 'sampah_terpilah') {
+          organik += e.organicKg || 0
+          nonOrganik += e.inorganicKg || 0
+        }
+      })
+
+      setStats({
+        masukKg: masuk,
+        organikKg: organik,
+        nonOrganikKg: nonOrganik
+      })
     }
+    loadStats()
   }, [])
+
+  const { masukKg, organikKg, nonOrganikKg } = stats
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,7 +55,7 @@ function SampahPage() {
             <h1 className="page-title">Area Sampah</h1>
             <p className="page-subtitle">Pantau sampah masuk & terpilah</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
@@ -87,13 +98,13 @@ function SampahPage() {
             Input Data
           </h2>
           <div className="space-y-3">
-            <Link 
+            <Link
               to="/sampah-masuk"
               className="block w-full big-button big-button-primary"
             >
               📥 Input Sampah Masuk
             </Link>
-            <Link 
+            <Link
               to="/sampah-terpilah"
               className="block w-full big-button big-button-secondary"
             >

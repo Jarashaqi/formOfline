@@ -37,7 +37,7 @@ function PanenKoheiForm() {
     })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (weightKg <= 0) {
       setSaveError('Berat kohei harus lebih dari 0 kg')
       return
@@ -51,7 +51,7 @@ function PanenKoheiForm() {
         weightKg
       }
 
-      addEntry(entry)
+      await addEntry(entry)
 
       setSaveSuccess(true)
       setSaveError('')
@@ -76,7 +76,7 @@ function PanenKoheiForm() {
             <h1 className="page-title">Panen Kohei Ayam</h1>
             <p className="page-subtitle">Catat panen pupuk kandang ayam</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/ayam')}
             className="big-button big-button-outline text-sm"
           >
@@ -154,9 +154,8 @@ function PanenKoheiForm() {
           <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid ? 'big-button-primary' : 'big-button-tertiary'
-            }`}
+            className={`w-full big-button ${isValid ? 'big-button-primary' : 'big-button-tertiary'
+              }`}
           >
             SIMPAN PANEN KOHEI
           </button>

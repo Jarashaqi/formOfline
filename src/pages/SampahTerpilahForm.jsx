@@ -75,7 +75,7 @@ function SampahTerpilahForm() {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!locationId || !shift) {
       setSaveError('Harap pilih lokasi dan shift')
       return
@@ -97,7 +97,7 @@ function SampahTerpilahForm() {
         inorganicKg: inorganicWeight
       }
 
-      addEntry(entry)
+      await addEntry(entry)
 
       setSaveSuccess(true)
       setSaveError('')
@@ -130,7 +130,7 @@ function SampahTerpilahForm() {
               Catat berat organik dan non organik dari satu lokasi
             </p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
@@ -158,7 +158,7 @@ function SampahTerpilahForm() {
           <div className="form-group">
             <label className="form-label">📍 Lokasi</label>
 
-            <button 
+            <button
               onClick={handleQRScan}
               className="w-full big-button big-button-primary mb-3"
             >
@@ -261,14 +261,13 @@ function SampahTerpilahForm() {
 
         {/* Tombol simpan */}
         <div className="p-4">
-          <button 
+          <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid 
-                ? 'big-button-primary' 
+            className={`w-full big-button ${isValid
+                ? 'big-button-primary'
                 : 'big-button-tertiary'
-            }`}
+              }`}
           >
             SIMPAN SAMPAH TERPILAH
           </button>
@@ -277,7 +276,7 @@ function SampahTerpilahForm() {
 
       {/* QR Scanner */}
       {showQRScanner && (
-        <QRScanner 
+        <QRScanner
           onScanSuccess={handleScanSuccess}
           onScanError={handleScanError}
           onClose={handleScannerClose}

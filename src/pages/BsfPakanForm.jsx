@@ -64,7 +64,7 @@ function BsfPakanForm() {
     })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedBoxId) {
       setSaveError('Harap pilih box BSF yang diberi makan')
       return
@@ -86,7 +86,7 @@ function BsfPakanForm() {
         // createdAt, id, dll biasanya ditambah di addEntry / storage utils
       }
 
-      addEntry(entry)
+      await addEntry(entry)
 
       setSaveSuccess(true)
       setSaveError('')
@@ -118,7 +118,7 @@ function BsfPakanForm() {
               Catat pemberian pakan organik ke box BSF
             </p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/bsf')}
             className="big-button big-button-outline text-sm"
           >
@@ -229,14 +229,13 @@ function BsfPakanForm() {
 
         {/* Tombol simpan */}
         <div className="p-4">
-          <button 
+          <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid 
-                ? 'big-button-primary' 
+            className={`w-full big-button ${isValid
+                ? 'big-button-primary'
                 : 'big-button-tertiary'
-            }`}
+              }`}
           >
             SIMPAN PAKAN BSF
           </button>

@@ -77,7 +77,7 @@ function TelurHarianForm() {
     })
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (totalLaying === 0) {
       setSaveError('Belum ada kandang yang ditandai bertelur')
       return
@@ -102,7 +102,7 @@ function TelurHarianForm() {
         crackedEggs: crackedCount
       }
 
-      addEntry(entry)
+      await addEntry(entry)
 
       setSaveSuccess(true)
       setSaveError('')
@@ -130,7 +130,7 @@ function TelurHarianForm() {
               Tap kandang yang hari ini bertelur
             </p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
@@ -231,9 +231,8 @@ function TelurHarianForm() {
                 <button
                   key={col}
                   onClick={() => setSelectedColumn(col)}
-                  className={`flex-1 toggle-button ${
-                    selectedColumn === col ? 'active' : ''
-                  }`}
+                  className={`flex-1 toggle-button ${selectedColumn === col ? 'active' : ''
+                    }`}
                 >
                   {col}
                 </button>
@@ -292,14 +291,13 @@ function TelurHarianForm() {
 
         {/* Tombol simpan */}
         <div className="p-4">
-          <button 
+          <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid 
-                ? 'big-button-primary' 
+            className={`w-full big-button ${isValid
+                ? 'big-button-primary'
                 : 'big-button-tertiary'
-            }`}
+              }`}
           >
             SIMPAN PANEN TELUR
           </button>

@@ -76,7 +76,7 @@ function PanenMaggotForm() {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!locationId || !harvestType || weight <= 0) {
       setSaveError('Harap pilih lokasi, tipe panen, dan atur berat panen')
       return
@@ -92,7 +92,7 @@ function PanenMaggotForm() {
         weightKg: weight
       }
 
-      addEntry(entry)
+      await addEntry(entry)
 
       setSaveSuccess(true)
       setSaveError('')
@@ -123,7 +123,7 @@ function PanenMaggotForm() {
             <h1 className="page-title">Panen Maggot</h1>
             <p className="page-subtitle">Catat berat panen maggot per tipe</p>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
@@ -151,7 +151,7 @@ function PanenMaggotForm() {
           <div className="form-group">
             <label className="form-label">📍 Lokasi</label>
 
-            <button 
+            <button
               onClick={handleQRScan}
               className="w-full big-button big-button-primary mb-3"
             >
@@ -225,7 +225,7 @@ function PanenMaggotForm() {
               />
 
               <div className="weight-controls">
-                <button 
+                <button
                   className="weight-btn minus"
                   onClick={() => setWeight(Math.max(0, weight - 0.5))}
                   disabled={weight <= 0}
@@ -237,7 +237,7 @@ function PanenMaggotForm() {
                   {weight.toFixed(1)} kg
                 </span>
 
-                <button 
+                <button
                   className="weight-btn plus"
                   onClick={() => setWeight(Math.min(50, weight + 0.5))}
                   disabled={weight >= 50}
@@ -255,14 +255,13 @@ function PanenMaggotForm() {
 
         {/* Tombol simpan */}
         <div className="p-4">
-          <button 
+          <button
             onClick={handleSave}
             disabled={!isValid}
-            className={`w-full big-button ${
-              isValid 
-                ? 'big-button-primary' 
+            className={`w-full big-button ${isValid
+                ? 'big-button-primary'
                 : 'big-button-tertiary'
-            }`}
+              }`}
           >
             SIMPAN ENTRI PANEN
           </button>
@@ -271,7 +270,7 @@ function PanenMaggotForm() {
 
       {/* Modal QR scanner */}
       {showQRScanner && (
-        <QRScanner 
+        <QRScanner
           onScanSuccess={handleScanSuccess}
           onScanError={handleScanError}
           onClose={handleScannerClose}
