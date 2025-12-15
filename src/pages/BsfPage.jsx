@@ -40,14 +40,14 @@ function BsfPage() {
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="page-title">Area BSF</h1>
-            <p className="page-subtitle">Pantau panen maggot & siklus BSF</p>
+            <h1 className="page-title">Area Maggot</h1>
+            <p className="page-subtitle">Catat data panen maggot, pakan, kasgot, dan telur maggot</p>
           </div>
           <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
-            Home
+            Kembali
           </button>
         </div>
       </div>
@@ -90,7 +90,7 @@ function BsfPage() {
               to="/bsf-pakan"
               className="block w-full big-button big-button-secondary"
             >
-              ♻️ Input Pakan BSF (Organik)
+              ♻️ Input Pakan Maggot
             </Link>
             <Link
               to="/panen-kasgot"
@@ -99,12 +99,11 @@ function BsfPage() {
               🧪 Panen Kasgot
             </Link>
             <Link
-              to="/sisa-organik-pupuk"
+              to="/telur-maggot"
               className="block w-full big-button big-button-tertiary"
             >
-              🌱 Pupuk dari Sisa Organik
+              🥚 Telur Maggot
             </Link>
-            {/* nanti kalau ada form BSF lain (pakan, prepupa, dll), taruh di sini */}
           </div>
         </div>
 

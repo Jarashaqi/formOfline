@@ -51,7 +51,7 @@ function SampahTerpilahForm() {
       setShowQRScanner(false)
       setScanError('')
     } else {
-      setScanError(`Lokasi tidak ditemukan: ${decodedText}`)
+      setScanError(`Kode Tempat tidak ditemukan: ${decodedText}`)
     }
   }
 
@@ -76,13 +76,16 @@ function SampahTerpilahForm() {
   }
 
   const handleSave = async () => {
-    if (!locationId || !shift) {
-      setSaveError('Harap pilih lokasi dan shift')
+    if (!locationId) {
+      setSaveError('Kode Tempat POC wajib diisi')
       return
     }
-
+    if (!shift) {
+      setSaveError('Shift wajib diisi')
+      return
+    }
     if (organicWeight <= 0 && inorganicWeight <= 0) {
-      setSaveError('Minimal salah satu berat (organik / non organik) harus diisi > 0')
+      setSaveError('Minimal salah satu berat sampah (organik atau non organik) wajib diisi dan harus lebih dari 0')
       return
     }
 
@@ -125,9 +128,9 @@ function SampahTerpilahForm() {
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="page-title">Sampah Terpilah</h1>
+            <h1 className="page-title">Input Sampah Terpilah ke POC</h1>
             <p className="page-subtitle">
-              Catat berat organik dan non organik dari satu lokasi
+              Catat berat sampah organik dan non organik yang terpilah
             </p>
           </div>
           <button
@@ -156,13 +159,13 @@ function SampahTerpilahForm() {
         {/* Lokasi */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">📍 Lokasi</label>
+            <label className="form-label">Kode Tempat POC</label>
 
             <button
               onClick={handleQRScan}
               className="w-full big-button big-button-primary mb-3"
             >
-              🔍 Scan QR Lokasi
+              Scan QR Kode Tempat
             </button>
 
             <div className="text-sm text-gray-600 mb-2">atau pilih manual:</div>
@@ -172,7 +175,7 @@ function SampahTerpilahForm() {
               onChange={handleManualLocationChange}
               className="form-input"
             >
-              <option value="">Pilih lokasi...</option>
+              <option value="">Pilih Kode Tempat...</option>
               {LOCATIONS.map(location => (
                 <option key={location.id} value={location.id}>
                   {location.name} ({location.id})
@@ -182,7 +185,7 @@ function SampahTerpilahForm() {
 
             {locationName && (
               <div className="mt-3 p-3 bg-gray-100 text-gray-800 rounded-lg border border-gray-200">
-                <div className="font-medium">Lokasi Terpilih:</div>
+                <div className="font-medium">Kode Tempat Terpilih:</div>
                 <div className="text-sm">{locationName} ({locationId})</div>
               </div>
             )}
@@ -198,7 +201,7 @@ function SampahTerpilahForm() {
         {/* Shift */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">⏰ Shift Pilah</label>
+            <label className="form-label">Shift</label>
             <div className="grid-3">
               {SHIFTS.map(shiftItem => (
                 <button
@@ -216,7 +219,7 @@ function SampahTerpilahForm() {
         {/* Berat Organik */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">🌱 Berat Organik (kg)</label>
+            <label className="form-label">Berat Sampah Organik (kg)</label>
             <div className="slider-container">
               <div className="weight-display">
                 {organicWeight.toFixed(1)} kg
@@ -239,7 +242,7 @@ function SampahTerpilahForm() {
         {/* Berat Non Organik */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">🧱 Berat Non Organik (kg)</label>
+            <label className="form-label">Berat Sampah Non Organik (kg)</label>
             <div className="slider-container">
               <div className="weight-display">
                 {inorganicWeight.toFixed(1)} kg
@@ -269,7 +272,7 @@ function SampahTerpilahForm() {
                 : 'big-button-tertiary'
               }`}
           >
-            SIMPAN SAMPAH TERPILAH
+            Simpan
           </button>
         </div>
       </div>

@@ -2,7 +2,7 @@
     "name": "Waste Data Entry",
     "short_name": "WasteApp",
     "description": "PWA for waste data entry in harsh environments",
-    "start_url": "/",
+    "start_url": "/formOfline/",
     "display": "standalone",
     "background_color": "#f8fafc",
     "theme_color": "#10b981",

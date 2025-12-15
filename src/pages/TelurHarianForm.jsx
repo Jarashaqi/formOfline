@@ -6,9 +6,6 @@ import { addEntry } from '../utils/storage'
 const COLUMNS = ['A', 'B', 'C', 'D']
 const ROWS = Array.from({ length: 18 }, (_, i) => i + 1) // A1–D18
 
-// step berat (gram) saat klik + / -
-const WEIGHT_STEP = 50
-
 function TelurHarianForm() {
   const navigate = useNavigate()
   const userName = getStoredUser()
@@ -36,8 +33,8 @@ function TelurHarianForm() {
     return initial
   })
 
-  // total berat (gram) dan telur retak
-  const [totalWeightGram, setTotalWeightGram] = useState(0)
+  // total berat (kg) dan telur retak
+  const [totalWeightKg, setTotalWeightKg] = useState(0)
   const [crackedCount, setCrackedCount] = useState(0)
 
   const [saveSuccess, setSaveSuccess] = useState(false)
@@ -62,16 +59,16 @@ function TelurHarianForm() {
 
   const handleWeightInputChange = (e) => {
     const value = e.target.value
-    const num = parseInt(value, 10)
+    const num = parseFloat(value)
     if (isNaN(num) || num < 0) {
-      setTotalWeightGram(0)
+      setTotalWeightKg(0)
     } else {
-      setTotalWeightGram(num)
+      setTotalWeightKg(num)
     }
   }
 
   const changeWeightByStep = (delta) => {
-    setTotalWeightGram(prev => {
+    setTotalWeightKg(prev => {
       const next = (prev || 0) + delta
       return next < 0 ? 0 : next
     })
@@ -79,11 +76,11 @@ function TelurHarianForm() {
 
   const handleSave = async () => {
     if (totalLaying === 0) {
-      setSaveError('Belum ada kandang yang ditandai bertelur')
+      setSaveError('Minimal satu kandang wajib ditandai bertelur')
       return
     }
-    if (totalWeightGram <= 0) {
-      setSaveError('Total berat telur harus lebih dari 0 gram')
+    if (totalWeightKg <= 0) {
+      setSaveError('Berat Telur wajib diisi dan harus lebih dari 0')
       return
     }
 
@@ -98,7 +95,8 @@ function TelurHarianForm() {
         layingCages,                 // array: A1, A2, B5, ...
         totalCages,
         totalLaying,
-        totalWeightGram,             // simpan dalam gram
+        totalWeightGram: Math.round(totalWeightKg * 1000), // simpan dalam gram untuk kompatibilitas
+        totalWeightKg,                // simpan juga dalam kg
         crackedEggs: crackedCount
       }
 
@@ -116,8 +114,7 @@ function TelurHarianForm() {
     }
   }
 
-  const isValid = totalLaying > 0 && totalWeightGram > 0
-  const totalWeightKg = totalWeightGram / 1000
+  const isValid = totalLaying > 0 && totalWeightKg > 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -127,7 +124,7 @@ function TelurHarianForm() {
           <div>
             <h1 className="page-title">Panen Telur Harian</h1>
             <p className="page-subtitle">
-              Tap kandang yang hari ini bertelur
+              Pilih kandang yang bertelur dan catat berat telur
             </p>
           </div>
           <button
@@ -156,7 +153,7 @@ function TelurHarianForm() {
         {/* Info tanggal & ringkasan */}
         <div className="card">
           <div className="text-sm text-gray-600 mb-1">
-            <span className="font-medium">Tanggal:</span> {today}
+            <span className="font-medium">Tanggal:</span> {today} <span className="text-xs text-gray-500">(otomatis terisi)</span>
           </div>
           <div className="text-sm text-gray-600">
             <span className="font-medium">Kandang bertelur:</span>{' '}
@@ -167,12 +164,12 @@ function TelurHarianForm() {
         {/* Total berat & telur retak */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">⚖️ Total Berat Telur (gram)</label>
+            <label className="form-label">Berat Telur (kg)</label>
             <div className="weight-controls">
               <button
                 className="weight-btn minus"
                 onClick={() => changeWeightByStep(-WEIGHT_STEP)}
-                disabled={totalWeightGram <= 0}
+                disabled={totalWeightKg <= 0}
               >
                 -
               </button>
@@ -180,16 +177,18 @@ function TelurHarianForm() {
               <input
                 type="number"
                 min="0"
+                step="0.01"
                 className="form-input"
                 style={{ maxWidth: '140px', textAlign: 'center' }}
-                value={totalWeightGram}
+                value={totalWeightKg.toFixed(2)}
                 onChange={handleWeightInputChange}
-                inputMode="numeric"
+                inputMode="decimal"
+                placeholder="0.00"
               />
 
               <button
                 className="weight-btn plus"
-                onClick={() => changeWeightByStep(WEIGHT_STEP)}
+                onClick={() => changeWeightByStep(0.1)}
               >
                 +
               </button>
@@ -275,7 +274,7 @@ function TelurHarianForm() {
               Kandang bertelur: <strong>{totalLaying}</strong> / {totalCages}
             </div>
             <div className="text-xs text-gray-600">
-              Total berat: <strong>{totalWeightGram} g</strong> (~{totalWeightKg.toFixed(2)} kg)
+              Total berat: <strong>{totalWeightKg.toFixed(2)} kg</strong>
             </div>
             {crackedCount > 0 && (
               <div className="text-xs text-gray-600">
@@ -299,7 +298,7 @@ function TelurHarianForm() {
                 : 'big-button-tertiary'
               }`}
           >
-            SIMPAN PANEN TELUR
+            Simpan
           </button>
         </div>
       </div>

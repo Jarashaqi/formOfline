@@ -18,7 +18,7 @@ function HomePage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Halo, {userName}</h1>
-            <p className="text-gray-600">Pilih area kerja</p>
+            <p className="text-gray-600">Pilih area untuk catat data</p>
           </div>
           <button 
             onClick={handleLogout}
@@ -48,7 +48,7 @@ function HomePage() {
             to="/bsf" 
             className="block w-full big-button big-button-tertiary"
           >
-            🪱 Area BSF
+            🪱 Area Maggot
           </Link>
         </div>
 
@@ -57,17 +57,17 @@ function HomePage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-gray-800">
-                History Entri Detail
+                Riwayat Entri
               </div>
               <div className="text-xs text-gray-500">
-                Lihat semua entri dari semua area
+                Lihat semua data yang telah dicatat
               </div>
             </div>
             <Link
               to="/history"
               className="px-3 py-2 text-xs rounded-lg bg-gray-900 text-white hover:bg-black"
             >
-              Buka History
+              Lihat Riwayat
             </Link>
           </div>
         </div>

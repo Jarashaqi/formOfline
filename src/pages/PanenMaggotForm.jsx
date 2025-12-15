@@ -52,7 +52,7 @@ function PanenMaggotForm() {
       setShowQRScanner(false)
       setScanError('')
     } else {
-      setScanError(`Lokasi tidak ditemukan: ${decodedText}`)
+      setScanError(`Kode Tempat tidak ditemukan: ${decodedText}`)
     }
   }
 
@@ -77,8 +77,16 @@ function PanenMaggotForm() {
   }
 
   const handleSave = async () => {
-    if (!locationId || !harvestType || weight <= 0) {
-      setSaveError('Harap pilih lokasi, tipe panen, dan atur berat panen')
+    if (!locationId) {
+      setSaveError('Kode Tempat wajib diisi')
+      return
+    }
+    if (!harvestType) {
+      setSaveError('Tipe Panen wajib diisi')
+      return
+    }
+    if (weight <= 0) {
+      setSaveError('Berat Panen wajib diisi dan harus lebih dari 0')
       return
     }
 
@@ -120,8 +128,8 @@ function PanenMaggotForm() {
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="page-title">Panen Maggot</h1>
-            <p className="page-subtitle">Catat berat panen maggot per tipe</p>
+            <h1 className="page-title">Input Panen Maggot</h1>
+            <p className="page-subtitle">Catat panen maggot berdasarkan tipe panen</p>
           </div>
           <button
             onClick={() => navigate('/home')}
@@ -149,13 +157,13 @@ function PanenMaggotForm() {
         {/* Lokasi */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">📍 Lokasi</label>
+            <label className="form-label">Kode Tempat</label>
 
             <button
               onClick={handleQRScan}
               className="w-full big-button big-button-primary mb-3"
             >
-              🔍 Scan QR Lokasi
+              Scan QR Kode Tempat
             </button>
 
             <div className="text-sm text-gray-600 mb-2">atau pilih manual:</div>
@@ -165,7 +173,7 @@ function PanenMaggotForm() {
               onChange={handleManualLocationChange}
               className="form-input"
             >
-              <option value="">Pilih lokasi...</option>
+              <option value="">Pilih Kode Tempat...</option>
               {LOCATIONS.map(location => (
                 <option key={location.id} value={location.id}>
                   {location.name} ({location.id})
@@ -175,7 +183,7 @@ function PanenMaggotForm() {
 
             {locationName && (
               <div className="mt-3 p-3 bg-gray-100 text-gray-800 rounded-lg border border-gray-200">
-                <div className="font-medium">Lokasi Terpilih:</div>
+                <div className="font-medium">Kode Tempat Terpilih:</div>
                 <div className="text-sm">{locationName} ({locationId})</div>
               </div>
             )}
@@ -191,7 +199,7 @@ function PanenMaggotForm() {
         {/* Tipe Panen */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">🧩 Tipe Panen</label>
+            <label className="form-label">Tipe Panen</label>
             <div className="grid-2">
               {HARVEST_TYPES.map(type => (
                 <button
@@ -209,7 +217,7 @@ function PanenMaggotForm() {
         {/* Berat Panen */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">⚖️ Berat Panen (kg)</label>
+            <label className="form-label">Berat Panen (kg)</label>
             <div className="slider-container">
               <div className="weight-display">
                 {weight.toFixed(1)} kg
@@ -263,7 +271,7 @@ function PanenMaggotForm() {
                 : 'big-button-tertiary'
               }`}
           >
-            SIMPAN ENTRI PANEN
+            Simpan
           </button>
         </div>
       </div>

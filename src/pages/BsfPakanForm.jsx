@@ -66,12 +66,11 @@ function BsfPakanForm() {
 
   const handleSave = async () => {
     if (!selectedBoxId) {
-      setSaveError('Harap pilih box BSF yang diberi makan')
+      setSaveError('Kode Tempat wajib diisi')
       return
     }
-
     if (feedWeightGram <= 0) {
-      setSaveError('Berat pakan harus lebih dari 0 gram')
+      setSaveError('Berat Pakan wajib diisi dan harus lebih dari 0')
       return
     }
 
@@ -113,7 +112,7 @@ function BsfPakanForm() {
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="page-title">Pakan BSF (Organik)</h1>
+            <h1 className="page-title">Input Pakan Maggot</h1>
             <p className="page-subtitle">
               Catat pemberian pakan organik ke box BSF
             </p>
@@ -122,7 +121,7 @@ function BsfPakanForm() {
             onClick={() => navigate('/bsf')}
             className="big-button big-button-outline text-sm"
           >
-            Kembali
+            Batal
           </button>
         </div>
       </div>
@@ -154,7 +153,7 @@ function BsfPakanForm() {
         {/* Box BSF */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">📦 Box / Tray BSF</label>
+            <label className="form-label">Kode Tempat</label>
             <select
               value={selectedBoxId}
               onChange={handleBoxChange}
@@ -179,7 +178,7 @@ function BsfPakanForm() {
         {/* Berat pakan */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">⚖️ Berat Pakan Organik (gram)</label>
+            <label className="form-label">Berat Pakan (gram)</label>
             <div className="weight-controls">
               <button
                 className="weight-btn minus"
@@ -237,7 +236,7 @@ function BsfPakanForm() {
                 : 'big-button-tertiary'
               }`}
           >
-            SIMPAN PAKAN BSF
+            Simpan
           </button>
         </div>
       </div>

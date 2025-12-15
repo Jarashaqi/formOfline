@@ -39,7 +39,7 @@ function PanenKoheiForm() {
 
   const handleSave = async () => {
     if (weightKg <= 0) {
-      setSaveError('Berat kohei harus lebih dari 0 kg')
+      setSaveError('Berat Pupa wajib diisi dan harus lebih dari 0')
       return
     }
 
@@ -73,14 +73,14 @@ function PanenKoheiForm() {
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="page-title">Panen Kohei Ayam</h1>
-            <p className="page-subtitle">Catat panen pupuk kandang ayam</p>
+            <h1 className="page-title">Panen Pupa dari Kohei</h1>
+            <p className="page-subtitle">Catat berat pupa yang dipanen dari kohei</p>
           </div>
           <button
             onClick={() => navigate('/ayam')}
             className="big-button big-button-outline text-sm"
           >
-            Kembali
+            Batal
           </button>
         </div>
       </div>
@@ -111,7 +111,7 @@ function PanenKoheiForm() {
         {/* Berat */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">⚖️ Berat Kohei (kg)</label>
+            <label className="form-label">Berat Pupa (kg)</label>
             <div className="slider-container">
               <div className="weight-display">
                 {weightKg.toFixed(1)} kg
@@ -157,7 +157,7 @@ function PanenKoheiForm() {
             className={`w-full big-button ${isValid ? 'big-button-primary' : 'big-button-tertiary'
               }`}
           >
-            SIMPAN PANEN KOHEI
+            Simpan
           </button>
         </div>
       </div>

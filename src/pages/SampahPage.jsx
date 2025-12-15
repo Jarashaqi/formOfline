@@ -53,13 +53,13 @@ function SampahPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="page-title">Area Sampah</h1>
-            <p className="page-subtitle">Pantau sampah masuk & terpilah</p>
+            <p className="page-subtitle">Catat data sampah masuk, terpilah, kompos, dan residu</p>
           </div>
           <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
-            Home
+            Kembali
           </button>
         </div>
       </div>
@@ -108,7 +108,19 @@ function SampahPage() {
               to="/sampah-terpilah"
               className="block w-full big-button big-button-secondary"
             >
-              ♻️ Input Sampah Terpilah
+              ♻️ Input Sampah Terpilah ke POC
+            </Link>
+            <Link
+              to="/input-sampah-kompos"
+              className="block w-full big-button big-button-tertiary"
+            >
+              🌱 Input Sampah ke Kompos
+            </Link>
+            <Link
+              to="/input-sampah-residu"
+              className="block w-full big-button big-button-tertiary"
+            >
+              🗑️ Input Sampah Residu
             </Link>
           </div>
         </div>

@@ -4,19 +4,22 @@ import { Html5Qrcode } from 'html5-qrcode'
 const QRScanner = ({ onScanSuccess, onScanError, onClose }) => {
   const scannerRef = useRef(null)
   const html5QrCodeRef = useRef(null)
+  const containerRef = useRef(null) // Track container untuk cleanup
 
   useEffect(() => {
-    const elementId = 'qr-reader'
+    // Generate unique ID per instance untuk prevent duplicate IDs
+    const elementId = `qr-reader-${Date.now()}-${Math.random().toString(36).slice(2)}`
     
-    // Create container element if it doesn't exist
-    let container = document.getElementById(elementId)
-    if (!container) {
-      container = document.createElement('div')
-      container.id = elementId
-      container.style.width = '100%'
-      container.style.height = '400px'
-      container.style.margin = '0 auto'
+    // Create container element
+    const container = document.createElement('div')
+    container.id = elementId
+    container.style.width = '100%'
+    container.style.height = '400px'
+    container.style.margin = '0 auto'
+    
+    if (scannerRef.current) {
       scannerRef.current.appendChild(container)
+      containerRef.current = container
     }
 
     // Initialize QR code scanner
@@ -45,10 +48,19 @@ const QRScanner = ({ onScanSuccess, onScanError, onClose }) => {
 
     // Cleanup function
     return () => {
-      if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
+      // Stop scanner jika masih running
+      if (html5QrCodeRef.current) {
         html5QrCodeRef.current.stop().catch(err => {
           console.error("Failed to stop scanner:", err)
         })
+        // Clear reference
+        html5QrCodeRef.current = null
+      }
+      
+      // Remove DOM element
+      if (containerRef.current && containerRef.current.parentNode) {
+        containerRef.current.parentNode.removeChild(containerRef.current)
+        containerRef.current = null
       }
     }
   }, [onScanSuccess, onScanError])

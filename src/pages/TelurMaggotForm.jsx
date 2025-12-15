@@ -3,28 +3,25 @@ import { useNavigate } from 'react-router-dom'
 import { getStoredUser } from '../utils/auth'
 import { addEntry } from '../utils/storage'
 
-const WEIGHT_STEP_KG = 1
-
-function PanenKasgotForm() {
+function TelurMaggotForm() {
   const navigate = useNavigate()
   const userName = getStoredUser()
 
-  const nowDisplay = useMemo(() => {
-    return new Date().toLocaleString('id-ID', {
+  const today = useMemo(
+    () => new Date().toLocaleDateString('id-ID', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }, [])
+      year: 'numeric'
+    }),
+    []
+  )
 
   const todayIso = useMemo(() => {
     return new Date().toISOString().slice(0, 10)
   }, [])
 
+  // Form state
   const [weightKg, setWeightKg] = useState(0)
-  const [source, setSource] = useState('')  // from where
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState('')
 
@@ -38,22 +35,18 @@ function PanenKasgotForm() {
   }
 
   const handleSave = async () => {
-    if (!source) {
-      setSaveError('Harap isi sumber kasgot (dari mana)')
-      return
-    }
+    // Validation
     if (weightKg <= 0) {
-      setSaveError('Berat kasgot harus lebih dari 0 kg')
+      setSaveError('Berat Telur wajib diisi dan harus lebih dari 0')
       return
     }
 
     try {
       const entry = {
-        formType: 'panen_kasgot',
-        date: todayIso,
         userName,
-        weightKg,
-        source // dari mana (bed, box, lokasi)
+        formType: 'telur_maggot',
+        date: todayIso,
+        weightKg
       }
 
       await addEntry(entry)
@@ -62,25 +55,24 @@ function PanenKasgotForm() {
       setSaveError('')
 
       setTimeout(() => {
-        setSaveSuccess(false)
         setWeightKg(0)
-        setSource('')
+        setSaveSuccess(false)
         navigate('/bsf')
-      }, 1500)
-    } catch (err) {
-      setSaveError('Gagal menyimpan entri: ' + err.message)
+      }, 2000)
+    } catch (error) {
+      setSaveError('Gagal menyimpan entri: ' + error.message)
     }
   }
 
-  const isValid = weightKg > 0 && !!source
+  const isValid = weightKg > 0
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="page-title">Panen Kasgot</h1>
-            <p className="page-subtitle">Catat panen kasgot dari bed atau box</p>
+            <h1 className="page-title">Telur Maggot</h1>
+            <p className="page-subtitle">Catat berat telur maggot yang dipanen</p>
           </div>
           <button
             onClick={() => navigate('/bsf')}
@@ -95,7 +87,7 @@ function PanenKasgotForm() {
         {/* Info umum */}
         <div className="card">
           <div className="text-sm text-gray-600 mb-1">
-            <span className="font-medium">Waktu:</span> {nowDisplay}
+            <span className="font-medium">Tanggal:</span> {today} <span className="text-xs text-gray-500">(otomatis terisi)</span>
           </div>
           <div className="text-sm text-gray-600">
             <span className="font-medium">Petugas:</span> {userName || '-'}
@@ -105,7 +97,7 @@ function PanenKasgotForm() {
         {/* Notif */}
         {saveSuccess && (
           <div className="card bg-gray-100 border-gray-200">
-            ✓ Panen kasgot berhasil disimpan!
+            ✓ Data telur maggot berhasil disimpan!
           </div>
         )}
         {saveError && (
@@ -114,24 +106,10 @@ function PanenKasgotForm() {
           </div>
         )}
 
-        {/* Sumber */}
+        {/* Berat Telur */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">Kode Tempat</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Contoh: BED-01, BOX-BSF-03"
-              value={source}
-              onChange={(e) => setSource(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Berat */}
-        <div className="card">
-          <div className="form-group">
-            <label className="form-label">Berat Kasgot (kg)</label>
+            <label className="form-label">Berat Telur (kg)</label>
             <div className="slider-container">
               <div className="weight-display">
                 {weightKg.toFixed(1)} kg
@@ -140,14 +118,14 @@ function PanenKasgotForm() {
                 type="range"
                 min="0"
                 max="200"
-                step="1"
+                step="0.1"
                 value={weightKg}
                 onChange={(e) => setWeightKg(parseFloat(e.target.value))}
               />
               <div className="weight-controls mt-2">
                 <button
                   className="weight-btn minus"
-                  onClick={() => changeWeight(-WEIGHT_STEP_KG)}
+                  onClick={() => changeWeight(-0.1)}
                   disabled={weightKg <= 0}
                 >
                   -
@@ -157,7 +135,7 @@ function PanenKasgotForm() {
                 </span>
                 <button
                   className="weight-btn plus"
-                  onClick={() => changeWeight(WEIGHT_STEP_KG)}
+                  onClick={() => changeWeight(0.1)}
                 >
                   +
                 </button>
@@ -185,4 +163,4 @@ function PanenKasgotForm() {
   )
 }
 
-export default PanenKasgotForm
+export default TelurMaggotForm

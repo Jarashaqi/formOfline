@@ -20,8 +20,8 @@ export default defineConfig({
         background_color: '#f8fafc',
         display: 'standalone',
         icon: 'src/assets/icon.png',
-        start_url: '/',
-        scope: '/',
+        start_url: '/formOfline/',
+        scope: '/formOfline/',
         categories: ['productivity', 'utilities'],
         lang: 'id',
         dir: 'ltr'

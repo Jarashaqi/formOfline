@@ -38,12 +38,18 @@ export async function pushEntries(entries) {
 
     // Debugging logs
     console.log('Syncing to:', url)
-    console.log('Using API Key:', API_KEY ? '***' + API_KEY.slice(-3) : 'NONE (Using Fallback)')
+    console.log('Using API Key:', API_KEY ? '***' + API_KEY.slice(-3) : 'NONE')
 
-    // Fallback logic for header: Use env var if present, else use hardcoded dev key
-    // const headerKey = API_KEY || 'DEV_SAMPAH_123'
-    // DEBUG: Force the known working key to rule out Env Var issues
-    const headerKey = 'DEV_SAMPAH_123'
+    // Use environment variable jika ada, jika tidak throw error untuk production
+    // Untuk development, bisa fallback ke session-based token atau require env var
+    const headerKey = API_KEY
+    if (!headerKey) {
+        // In production, this should be set via environment variable
+        // For development, you might want to use a session token or require .env file
+        throw new Error(
+            'API key tidak ditemukan. Pastikan VITE_API_KEY di-set di environment variable atau .env file.'
+        )
+    }
 
     let res
     try {

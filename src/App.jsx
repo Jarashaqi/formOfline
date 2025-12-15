@@ -10,8 +10,11 @@ import PanenKoheiForm from './pages/PanenKoheiForm'
 import SampahTerpilahForm from './pages/SampahTerpilahForm'
 import HistoryPage from './pages/HistoryPage'
 import PanenKasgotForm from './pages/PanenKasgotForm'
-import SisaOrganikPupukForm from './pages/SisaOrganikPupukForm'
 import AyamPage from './pages/AyamPage'
+import InputPrepupaKoheiForm from './pages/InputPrepupaKoheiForm'
+import InputSampahKomposForm from './pages/InputSampahKomposForm'
+import InputSampahResiduForm from './pages/InputSampahResiduForm'
+import TelurMaggotForm from './pages/TelurMaggotForm'
 import SampahPage from './pages/SampahPage'
 import BsfPage from './pages/BsfPage'
 import { getStoredUser } from './utils/auth'
@@ -66,6 +69,15 @@ function App() {
           />
 
           <Route
+            path="/input-prepupa-kohei"
+            element={
+              <PrivateRoute>
+                <InputPrepupaKoheiForm />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
             path="/sampah"
             element={
               <PrivateRoute>
@@ -92,19 +104,19 @@ function App() {
           />
 
           <Route
-            path="/bsf-pakan"
+            path="/telur-maggot"
             element={
               <PrivateRoute>
-                <BsfPakanForm />
+                <TelurMaggotForm />
               </PrivateRoute>
             }
           />
 
           <Route
-            path="/sisa-organik-pupuk"
+            path="/bsf-pakan"
             element={
               <PrivateRoute>
-                <SisaOrganikPupukForm />
+                <BsfPakanForm />
               </PrivateRoute>
             }
           />
@@ -124,6 +136,24 @@ function App() {
             element={
               <PrivateRoute>
                 <SampahTerpilahForm />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/input-sampah-kompos"
+            element={
+              <PrivateRoute>
+                <InputSampahKomposForm />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/input-sampah-residu"
+            element={
+              <PrivateRoute>
+                <InputSampahResiduForm />
               </PrivateRoute>
             }
           />

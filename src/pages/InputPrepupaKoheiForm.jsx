@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getStoredUser } from '../utils/auth'
 import { addEntry } from '../utils/storage'
@@ -13,35 +13,19 @@ const LOCATIONS = [
   { id: "LOC-KANTIN", name: "Kantin" }
 ]
 
-function SampahMasukForm() {
+function InputPrepupaKoheiForm() {
   const navigate = useNavigate()
   const userName = getStoredUser()
 
   // Form state
   const [locationId, setLocationId] = useState('')
   const [locationName, setLocationName] = useState('')
-  const [wasteType, setWasteType] = useState('')
-  const [shift, setShift] = useState('')
   const [weight, setWeight] = useState(0)
   const [manualLocation, setManualLocation] = useState('')
   const [showQRScanner, setShowQRScanner] = useState(false)
   const [scanError, setScanError] = useState('')
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState('')
-  const timeoutRef = useRef(null) // Store timeout ID untuk cleanup
-
-  const wasteTypes = [
-    { id: 'sayur', label: '🌱 Sayur', value: 'sayur' },
-    { id: 'makanan', label: '🍛 Makanan Matang', value: 'makanan' },
-    { id: 'campuran', label: '🔁 Campuran', value: 'campuran' },
-    { id: 'lainnya', label: 'Lainnya', value: 'lainnya' }
-  ]
-
-  const shifts = [
-    { id: 'pagi', label: 'Pagi', value: 'pagi' },
-    { id: 'siang', label: 'Siang', value: 'siang' },
-    { id: 'malam', label: 'Malam', value: 'malam' }
-  ]
 
   const handleQRScan = () => {
     setShowQRScanner(true)
@@ -49,7 +33,6 @@ function SampahMasukForm() {
   }
 
   const handleScanSuccess = (decodedText) => {
-    // Look up location by ID
     const location = LOCATIONS.find(loc => loc.id === decodedText)
     if (location) {
       setLocationId(location.id)
@@ -85,82 +68,53 @@ function SampahMasukForm() {
   const handleSave = async () => {
     // Validation
     if (!locationId) {
-      setSaveError('Sampah Berasal Dari wajib diisi')
-      return
-    }
-    if (!wasteType) {
-      setSaveError('Jenis Sampah wajib diisi')
-      return
-    }
-    if (!shift) {
-      setSaveError('Shift wajib diisi')
+      setSaveError('Kode Tempat wajib diisi')
       return
     }
     if (weight <= 0) {
-      setSaveError('Berat Sampah wajib diisi dan harus lebih dari 0')
+      setSaveError('Berat Prepupa wajib diisi dan harus lebih dari 0')
       return
     }
 
     try {
-      // Create entry object
       const entry = {
         userName,
-        formType: 'sampah_masuk',
+        formType: 'input_prepupa_kohei',
         locationId,
         locationName,
-        wasteType,
-        shift,
         weightKg: weight
       }
 
-      // Save to localStorage
-      const savedEntry = await addEntry(entry)
+      await addEntry(entry)
 
-      // Show success message
       setSaveSuccess(true)
       setSaveError('')
 
-      // Clear form after 2 seconds and navigate home
-      // Store timeout ID untuk cleanup
-      timeoutRef.current = setTimeout(() => {
-        // Reset form
+      setTimeout(() => {
         setLocationId('')
         setLocationName('')
-        setWasteType('')
-        setShift('')
         setWeight(0)
         setManualLocation('')
         setSaveSuccess(false)
-        navigate('/home')
-        timeoutRef.current = null
+        navigate('/ayam')
       }, 2000)
     } catch (error) {
       setSaveError('Gagal menyimpan entri: ' + error.message)
     }
   }
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-      }
-    }
-  }, [])
-
-  const isValid = locationId && wasteType && shift && weight > 0
+  const isValid = locationId && weight > 0
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="page-header">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="page-title">Input Sampah Masuk</h1>
-            <p className="page-subtitle">Catat sampah yang masuk ke lokasi</p>
+            <h1 className="page-title">Input Prepupa ke Kohei</h1>
+            <p className="page-subtitle">Catat berat prepupa yang dimasukkan ke kohei</p>
           </div>
           <button
-            onClick={() => navigate('/home')}
+            onClick={() => navigate('/ayam')}
             className="big-button big-button-outline text-sm"
           >
             Batal
@@ -183,10 +137,10 @@ function SampahMasukForm() {
           </div>
         )}
 
-        {/* Location Section */}
+        {/* Kode Tempat Section */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">Sampah Berasal Dari</label>
+            <label className="form-label">Kode Tempat</label>
             <button
               onClick={handleQRScan}
               className="w-full big-button big-button-primary mb-3"
@@ -223,46 +177,10 @@ function SampahMasukForm() {
           </div>
         </div>
 
-        {/* Waste Type Section */}
+        {/* Berat Prepupa Section */}
         <div className="card">
           <div className="form-group">
-            <label className="form-label">Jenis Sampah</label>
-            <div className="grid-2">
-              {wasteTypes.map(type => (
-                <button
-                  key={type.id}
-                  onClick={() => setWasteType(type.value)}
-                  className={`toggle-button ${wasteType === type.value ? 'active' : ''}`}
-                >
-                  {type.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Shift Section */}
-        <div className="card">
-          <div className="form-group">
-            <label className="form-label">Shift</label>
-            <div className="grid-3">
-              {shifts.map(shiftItem => (
-                <button
-                  key={shiftItem.id}
-                  onClick={() => setShift(shiftItem.value)}
-                  className={`toggle-button ${shift === shiftItem.value ? 'active' : ''}`}
-                >
-                  {shiftItem.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Weight Section */}
-        <div className="card">
-          <div className="form-group">
-            <label className="form-label">Berat Sampah (kg)</label>
+            <label className="form-label">Berat Prepupa (kg)</label>
             <div className="slider-container">
               <div className="weight-display">
                 {weight.toFixed(1)} kg
@@ -329,4 +247,4 @@ function SampahMasukForm() {
   )
 }
 
-export default SampahMasukForm
+export default InputPrepupaKoheiForm

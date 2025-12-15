@@ -43,13 +43,13 @@ function AyamPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="page-title">Area Ayam</h1>
-            <p className="page-subtitle">Pantau panen telur harian</p>
+            <p className="page-subtitle">Catat data panen telur dan kohei</p>
           </div>
           <button
             onClick={() => navigate('/home')}
             className="big-button big-button-outline text-sm"
           >
-            Home
+            Kembali
           </button>
         </div>
       </div>
@@ -92,12 +92,17 @@ function AyamPage() {
               🥚 Panen Telur Harian
             </Link>
             <Link
-              to="/panen-kohei"
+              to="/input-prepupa-kohei"
               className="block w-full big-button big-button-secondary"
             >
-              💩 Panen Kohei Ayam
+              🐛 Input Prepupa ke Kohei
             </Link>
-            {/* nanti kalau ada form ayam lain, tinggal tambah di sini */}
+            <Link
+              to="/panen-kohei"
+              className="block w-full big-button big-button-tertiary"
+            >
+              💩 Panen Pupa dari Kohei
+            </Link>
           </div>
         </div>
 

@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getEntries, syncEntriesToServer } from '../utils/storage'
 import { getStoredUser } from '../utils/auth'
+import {
+  getPendingUnsyncedCount,
+  getLastSyncResult,
+  saveLastSyncResult,
+  getLastError,
+  saveLastError,
+  estimateStorageUsage,
+  checkSyncInProgress
+} from '../utils/observability'
 
 function HistoryPage() {
   const userName = getStoredUser()
@@ -9,10 +18,43 @@ function HistoryPage() {
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncMessage, setSyncMessage] = useState('')
+  const [pendingCount, setPendingCount] = useState(0)
+  const [lastSync, setLastSync] = useState(null)
+  const [lastError, setLastError] = useState(null)
+  const [storageUsage, setStorageUsage] = useState(null)
+  const [syncInProgress, setSyncInProgress] = useState(false)
 
   useEffect(() => {
     loadEntries()
+    loadObservability()
+    
+    // Refresh observability setiap 5 detik
+    const interval = setInterval(() => {
+      loadObservability()
+    }, 5000)
+    
+    return () => clearInterval(interval)
   }, [])
+
+  const loadObservability = async () => {
+    try {
+      const [count, sync, error, usage, inProgress] = await Promise.all([
+        getPendingUnsyncedCount(),
+        Promise.resolve(getLastSyncResult()),
+        Promise.resolve(getLastError()),
+        estimateStorageUsage(),
+        checkSyncInProgress()
+      ])
+      
+      setPendingCount(count)
+      setLastSync(sync)
+      setLastError(error)
+      setStorageUsage(usage)
+      setSyncInProgress(inProgress)
+    } catch (e) {
+      console.error('Error loading observability:', e)
+    }
+  }
 
   const loadEntries = async () => {
     setLoading(true)
@@ -31,31 +73,53 @@ function HistoryPage() {
   }
 
   const handleSync = async () => {
+    // Prevent double-click
+    if (syncing || syncInProgress) {
+      return
+    }
+    
     setSyncing(true)
     setSyncMessage('')
 
     try {
       const result = await syncEntriesToServer()
+      
+      // Save observability data
+      saveLastSyncResult(result)
+      if (result.error) {
+        saveLastError(new Error(result.error))
+      }
+      
       if (result.success) {
         setSyncMessage(`✓ Berhasil sinkron ${result.syncedCount} entri`)
         // Reload entries to show updated sync status
-        loadEntries()
+        await loadEntries()
       } else {
         setSyncMessage(`✗ Gagal sinkron: ${result.error}`)
+        saveLastError(new Error(result.error))
       }
     } catch (error) {
       setSyncMessage(`✗ Gagal sinkron: ${error.message}`)
+      saveLastError(error)
     } finally {
       setSyncing(false)
+      await loadObservability() // Refresh observability
     }
   }
 
   const getFormTypeLabel = (formType) => {
     const labels = {
-      sampah_masuk: 'Sampah Masuk',
-      panen_maggot: 'Panen Maggot',
+      sampah_masuk: 'Input Sampah Masuk',
+      panen_maggot: 'Input Panen Maggot',
       telur_harian: 'Panen Telur Harian',
-      sampah_terpilah: 'Sampah Terpilah'
+      sampah_terpilah: 'Input Sampah Terpilah ke POC',
+      panen_kohei: 'Panen Pupa dari Kohei',
+      bsf_pakan: 'Input Pakan Maggot',
+      panen_kasgot: 'Panen Kasgot',
+      input_prepupa_kohei: 'Input Prepupa ke Kohei',
+      input_sampah_kompos: 'Input Sampah ke Kompos',
+      input_sampah_residu: 'Input Sampah Residu',
+      telur_maggot: 'Telur Maggot'
     }
     return labels[formType] || 'Umum'
   }
@@ -129,22 +193,54 @@ function HistoryPage() {
       </div>
 
       <div className="p-4">
-        {/* Sync button and stats */}
+        {/* Sync button and observability stats */}
         <div className="card mb-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <button
               onClick={handleSync}
-              disabled={syncing}
-              className={`px-6 py-3 rounded-lg font-medium ${syncing
+              disabled={syncing || syncInProgress}
+              className={`px-6 py-3 rounded-lg font-medium ${(syncing || syncInProgress)
                   ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                   : 'bg-gray-900 text-white hover:bg-black'
                 }`}
             >
-              {syncing ? 'Menyinkronkan...' : '🔄 Sinkron Data'}
+              {syncing || syncInProgress ? 'Menyinkronkan...' : '🔄 Sinkron Data'}
             </button>
-            <div className="text-sm text-gray-600">
-              Total: {entries.length} entri | Belum sinkron: {entries.filter(e => !e.synced).length}
+            <div className="text-sm text-gray-600 space-y-1">
+              <div>Total: {entries.length} entri | Belum sinkron: {pendingCount}</div>
+              {storageUsage && (
+                <div className="text-xs">
+                  Storage: ~{storageUsage.estimatedMB} MB ({storageUsage.entryCount} entries)
+                  {storageUsage.warning && (
+                    <span className="text-orange-600 ml-2">⚠ {storageUsage.warning}</span>
+                  )}
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Observability info */}
+          <div className="mt-3 space-y-2">
+            {lastSync && (
+              <div className="text-xs text-gray-500">
+                Last sync: {new Date(lastSync.timestamp).toLocaleString('id-ID')} 
+                {lastSync.success ? (
+                  <span className="text-green-600 ml-2">✓ {lastSync.syncedCount} synced</span>
+                ) : (
+                  <span className="text-red-600 ml-2">✗ Failed</span>
+                )}
+              </div>
+            )}
+            {lastError && (
+              <div className="text-xs text-red-600">
+                Last error: {lastError.message} ({new Date(lastError.timestamp).toLocaleString('id-ID')})
+              </div>
+            )}
+            {syncInProgress && !syncing && (
+              <div className="text-xs text-blue-600">
+                ⚠ Sync sedang berjalan di tab lain
+              </div>
+            )}
           </div>
 
           {syncMessage && (
